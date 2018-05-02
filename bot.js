@@ -40,7 +40,7 @@ client.on('message', message => {
         message.channel.send(`You wanted to kick: ${taggedUser.username}`);
     } else if (command === 'avatar') {
         if (!message.mentions.users.size) {
-            return message.channel.send(`Your avatar: ${message.author.displayAvatarURL()}`);
+            return message.channel.send(`Your avatar: ${message.author.displayAvatarURL}`);
         }
     
         // ...
