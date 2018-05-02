@@ -38,6 +38,12 @@ client.on('message', message => {
         const taggedUser = message.mentions.users.first();
     
         message.channel.send(`You wanted to kick: ${taggedUser.username}`);
+    } else if (command === 'avatar') {
+        if (!message.mentions.users.size) {
+            return message.channel.send(`Your avatar: ${message.author.displayAvatarURL()}`);
+        }
+    
+        // ...
     }
 });
 
