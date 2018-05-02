@@ -1,15 +1,14 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const { prefix } = require('./config.json');
 
 client.on('ready', () => {
     console.log('I am ready!');
 });
 
-// Create an event listener for messages that contain 'ping'
 client.on('message', message => {
-    if (message.content === 'ping') {
-        // Reply with 'pong'
-        message.reply('pong');
+    if (message.content === `${prefix}ping`) {
+        message.channel.send('Pong.');
     }
 });
 
