@@ -1,6 +1,14 @@
+const fs = require('fs');
 const Discord = require('discord.js');
-const client = new Discord.Client();
 const { prefix } = require('./config.json');
+
+const client = new Discord.Client();
+client.commands = new Discord.Collection();
+const commandFiles = fs.readdirSync('./commands');
+for (const file of commandFiles) {
+    const command = require(`./commands/${file}`);
+    client.commands.set(command.name, command);
+}
 
 client.on('ready', () => {
     console.log('I am ready!');
@@ -12,44 +20,13 @@ client.on('message', message => {
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
 
-    if (message.content.startsWith(`${prefix}ping`)) {
-        message.channel.send('Pong.');
-    } else if (message.content.startsWith(`${prefix}beep`)) {
-        message.channel.send('Boop.');
-    } else if (message.content === `${prefix}server`) {
-        message.channel.send(`Server name: ${message.guild.name}\nTotal members: ${message.guild.memberCount}`);
-    } else if (message.content === `${prefix}user-info`) {
-        message.channel.send(`Your username: ${message.author.username}\nYour ID: ${message.author.id}`);
-    } else if (command === 'args-info') {
-        if (!args.length) {
-            return message.channel.send(`You didn't provide any arguments, ${message.author}!`);
-        }
-        else if (args[0] === 'foo') {
-            return message.channel.send('bar');
-        }
-    
-        message.channel.send(`First argument: ${args[0]}`);
-    } else if (command === 'kick') {
-        if (!message.mentions.users.size) {
-            return message.reply('you need to tag a user in order to kick them!').catch(error => console.error(error));
-        }
-        // grab the "first" mentioned user from the message
-        // this will return a `User` object, just like `message.author`
-        const taggedUser = message.mentions.users.first();
-    
-        message.channel.send(`You wanted to kick: ${taggedUser.username}`);
-    } else if (command === 'avatar') {
-        if (!message.mentions.users.size) {
-            return message.channel.send(`Your avatar: ${message.author.displayAvatarURL}`);
-        }
-    
-        const avatarList = message.mentions.users.map(user => {
-            return `${user.username}'s avatar: ${user.displayAvatarURL}`;
-        });
-    
-        // send the entire array of strings as a message
-        // by default, discord.js will `.join()` the array with `\n`
-        message.channel.send(avatarList);
+    if (!client.commands.has(command)) return;
+
+    try {
+        client.commands.get(command).execute(message, args);
+    } catch (error) {
+        console.error(error);
+        message.reply('there was an error trying to execute that command!');
     }
 });
 
